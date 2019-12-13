@@ -39,7 +39,3 @@ class Cache(object):
         with open(str(self.paths.cache / 'data0.pickle'), 'wb') as file:
             file.write(pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL))
         return True
-
-
-cone = Cache()
-cone.dump()

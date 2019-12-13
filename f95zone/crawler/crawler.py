@@ -47,11 +47,4 @@ class Crawler(object):
         response = self.session.post(post_url, data=payload)
         assert isinstance(response, requests_html.HTMLResponse)
         if self.__username in response.text:
-            print("voila")
             self.logged_in = True
-            wishes = self.session.get(self._api_ends['watchlist']).html
-            print(wishes)
-
-
-cone = Crawler('replaced_for_privacy', 'replaced_for_privacy')
-cone.login()

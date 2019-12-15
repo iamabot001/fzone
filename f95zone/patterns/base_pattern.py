@@ -11,10 +11,10 @@ class Pattern(object):
         self.re = re
 
     @staticmethod
-    def make_pattern(string: str):
+    def make_pattern(string: str) -> re.Pattern:
         pattern = re.compile(string)
         return pattern
 
     @property
-    def pattern(self):
+    def pattern(self) -> re.Pattern:
         return self.make_pattern(self._pattern)

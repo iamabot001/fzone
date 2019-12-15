@@ -11,13 +11,12 @@ class OverviewParser(object):
     def __init__(self, overview: str):
         self._overview = overview
 
-    def parse(self):
-        overview = re.findall(OverviewPattern().pattern, self._overview)
-        assert isinstance(overview, list)
+    def parse(self) -> str:
+        overview: list = re.findall(OverviewPattern().pattern, self._overview)
         if overview:
-            overview = overview[0]
+            overview: str = overview[0]
             return overview
 
     @property
-    def overview(self):
+    def overview(self) -> str:
         return self.parse()

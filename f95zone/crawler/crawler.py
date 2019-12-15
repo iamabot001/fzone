@@ -1,4 +1,8 @@
+import typing
+
+
 import requests_html
+import requests
 from f95zone.paths.pathmeta import PathMeta
 
 
@@ -6,6 +10,8 @@ class Crawler(object):
     """
     Crawl for games in your watchlist
     """
+    response_type = typing.Union[requests.Response, requests_html.HTMLResponse]
+
     def __init__(self, username: str, password: str):
         self.__username = username
         self.__password = password
@@ -14,7 +20,7 @@ class Crawler(object):
         self.paths = PathMeta()
 
     @property
-    def _api_ends(self):
+    def _api_ends(self) -> dict:
         ends = {
             'url': 'https://f95zone.to',
             'watchlist': 'https://f95zone.to/watched/threads?unread=0',
@@ -22,15 +28,12 @@ class Crawler(object):
         }
         return ends
 
-    def login(self):
-        page = self.session.get(self._api_ends['login'])
-        assert isinstance(page, requests_html.HTMLResponse)
-        _xftoken = page.html.find('input[name="_xfToken"]')
-        assert isinstance(_xftoken, list)
+    def login(self) -> bool:
+        page: Crawler.response_type = self.session.get(self._api_ends['login'])
+        _xftoken: list = page.html.find('input[name="_xfToken"]')
         if _xftoken:
-            _xftoken = _xftoken[0]
-            assert isinstance(_xftoken, requests_html.Element)
-            _xftoken = _xftoken.attrs['value']
+            _xftoken: requests_html.Element = _xftoken[0]
+            _xftoken: str = _xftoken.attrs['value']
         else:
             self.logged_in = False
             return False
@@ -46,44 +49,47 @@ class Crawler(object):
             '_xfToken': _xftoken
         }
         post_url = f'{self._api_ends["login"]}/login'
-        response = self.session.post(post_url, data=payload)
-        assert isinstance(response, requests_html.HTMLResponse)
-        assertion = self.session.get(self._api_ends['url'])
-        assert isinstance(assertion, requests_html.HTMLResponse)
-        assertion = assertion.html.find('a[href="/account/"]>span[class="p-navgroup-linkText"]')
-        assert isinstance(assertion, list)
+        response: Crawler.response_type = self.session.post(post_url, data=payload)
+        assert response.ok
+        assertion: Crawler.response_type = self.session.get(self._api_ends['url'])
+        assertion: list = assertion.html.find('a[href="/account/"]>span[class="p-navgroup-linkText"]')
         if assertion:
-            assertion = assertion[0]
-            assert isinstance(assertion, requests_html.Element)
+            assertion: requests_html.Element = assertion[0]
             if self.__username in assertion.text:
                 self.logged_in = True
                 return True
 
-    def get_watched(self):
+    def get_watched_games(self) -> list:
         if not self.logged_in:
             assert self.login()
-        content = []
-        watchlist_page = self.session.get(self._api_ends['watchlist'])
-        assert isinstance(watchlist_page, requests_html.HTMLResponse)
-        last_page = watchlist_page.html.find('li[class="pageNav-page "]>a')
-        assert isinstance(last_page, list) and last_page
-        last_page = last_page[0]
-        assert isinstance(last_page, requests_html.Element)
-        last_page = int(last_page.text)
+        content = list()
+        watchlist_page: Crawler.response_type = self.session.get(self._api_ends['watchlist'])
+        last_page: int = self.last_page_getter(watchlist_page)
         urls = [f'https://f95zone.to/watched/threads?unread=0&page={x}' for x in range(2, last_page + 1)]
         urls.insert(0, self._api_ends['watchlist'])
         for url in urls:
-            page = self.session.get(url)
-            assert isinstance(page, requests_html.HTMLResponse)
-            data = page.html.find('a[href$="unread"]')
+            page: Crawler.response_type = self.session.get(url)
+            data: list = page.html.find('a[href$="unread"]')
             if data:
                 for item in data:
                     temp = f'https://f95zone.to{item.attrs["href"]}'
                     content.append(temp)
         return content
 
-    def dump(self):
-        content = self.get_watched()
-        with open(self.paths.cache / 'watchlist', 'w') as file:
+    def dump(self) -> bool:
+        content = self.get_watched_games()
+        with open(str(self.paths.cache / 'watchlist'), 'w') as file:
             file.writelines((f'{x}\n' for x in content))
+        return True
 
+    @staticmethod
+    def last_page_getter(page: typing.Union[requests_html.HTMLResponse, requests.Response]) -> int:
+        pages = page.html.find('li>a[href^="/watched/threads?unread=0&page="]')
+        max_: int = 2
+        if pages:
+            for item in pages:
+                item: requests_html.Element
+                text = int(item.text)
+                if text > max_:
+                    max_ = text
+        return max_

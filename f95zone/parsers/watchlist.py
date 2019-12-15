@@ -9,19 +9,19 @@ class WatchlistParser(object):
     def __init__(self, file_path: str):
         self.file_path = file_path
 
-    def parse(self):
+    def parse(self) -> list:
         with open(self.file_path, 'r') as file:
             content = file.read()
-        watchlist = re.findall(WatchlistPattern().pattern, content)
+        watchlist: list = re.findall(WatchlistPattern().pattern, content)
         data_table = []
         if watchlist:
             for item in watchlist:
-                url = re.findall(F95urlPattern().pattern, item)
-                assert url and isinstance(url[0], str)
-                url = url[0]
+                url: list = re.findall(F95urlPattern().pattern, item)
+                assert url
+                url: str = url[0]
                 data_table.append(url)
             return data_table
 
     @property
-    def watchlist(self):
+    def watchlist(self) -> list:
         return self.parse()

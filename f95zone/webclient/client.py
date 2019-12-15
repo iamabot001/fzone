@@ -1,43 +1,39 @@
+import typing
+
+
 import requests_html
+import requests
 
 
 class Client(object):
     """
     Web client
     """
+    response_object = typing.Union[requests.Response, requests_html.HTMLResponse]
+
     def __init__(self):
         self.session = requests_html.HTMLSession()
-        self.response_object = requests_html.HTMLResponse
-        self.element_object = requests_html.Element
 
-    def get_game_data(self, url: str):
-        response = self.session.get(url)
-        assert isinstance(response, self.response_object)
-        title = response.html.find('h1.p-title-value')
-        assert isinstance(title, list)
+    def get_game_data(self, url: str) -> dict:
+        response: Client.response_object = self.session.get(url)
+        title: list = response.html.find('h1.p-title-value')
         if title:
-            title = title[0]
-            assert isinstance(title, self.element_object)
-            title = title.text
-            assert isinstance(title, str)
-            title = title.replace(u'\xa0', u' ')
-        tags = response.html.find('a.tagItem')
-        assert isinstance(tags, list)
+            title: requests_html.Element = title[0]
+            title: str = title.text
+            title: str = title.replace(u'\xa0', u' ')
+        tags: list = response.html.find('a.tagItem')
         if tags:
             temp = list()
             for item in tags:
-                assert isinstance(item, self.element_object)
+                item: requests_html.Element
                 temp.append(item.text)
             tags = temp
             del temp
-        overview = response.html.find('div.bbWrapper')
-        assert isinstance(overview, list)
+        overview: list = response.html.find('div.bbWrapper')
         if overview:
-            overview = overview[0]
-            assert isinstance(overview, self.element_object)
-            overview = overview.text
-            assert isinstance(overview, str)
-            overview = overview.replace(u'\u200b', '')
+            overview: requests_html.Element = overview[0]
+            overview: str = overview.text
+            overview: str = overview.replace(u'\u200b', '')
 
         data = {
             'title': title,

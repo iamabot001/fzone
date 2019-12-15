@@ -1,4 +1,5 @@
 import re
+import typing
 
 
 from f95zone.patterns.title import TitlePattern
@@ -12,32 +13,42 @@ class TitleParser(object):
     def __init__(self, title: str):
         self._title = title
 
-    def parse(self):
-        name = re.findall(TitlePattern().pattern, self._title)
-        assert isinstance(name, list)
+    def parse(self) -> dict:
+        title_tags = None
+        name: list = re.findall(TitlePattern().pattern, self._title)
         if name:
-            name = name[0]
-        tags = re.findall(TagPattern().pattern, self._title)
-        assert isinstance(tags, list)
+            name: str = name[0]
+        tags: list = re.findall(TagPattern().pattern, self._title)
+
+        if len(tags) == 1:
+            data = {
+                'name': '] '.split(self._title)[-1],
+                'tags': tags,
+                'version': 'NA',
+                'developer': 'NA'
+            }
+            return data
+
         if tags and (len(tags) > 2):
-            version = tags[-2]
-            developer = tags[-1]
-            title_tags = tags[:-2]
+            version: str = tags[-2]
+            developer: str = tags[-1]
+            title_tags: typing.Union[list, None] = tags[:-2]
         elif tags:
-            version = tags[0]
-            developer = tags[1]
+            version: str = tags[0]
+            developer: str = tags[1]
         else:
-            return
+            return {}
         data = {
             'name': name,
             'version': version,
             'developer': developer
         }
         if len(tags) > 2:
-            data['tags'] = title_tags
-            return data
+            if title_tags:
+                data['tags'] = title_tags
+                return data
         return data
 
     @property
-    def title(self):
+    def title(self) -> dict:
         return self.parse()

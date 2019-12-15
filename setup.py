@@ -5,6 +5,7 @@ setup(
     name='f95zone',
     version='0.1',
     packages=setuptools.find_packages(),
+    install_requires=['requests', 'requests_html', 'wheel', 'setuptools', ],
     include_package_data=True,
     url='https://github.com/iamabot001/fzone',
     license='',

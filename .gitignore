@@ -4,3 +4,4 @@ venv/*
 build/*
 dist/*
 temp.py
+f95zone.egg-info/

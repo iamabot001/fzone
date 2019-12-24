@@ -1,4 +1,5 @@
 import os
+import platform
 import pathlib
 
 
@@ -8,7 +9,6 @@ class PathMeta(object):
     """
     def __init__(self):
         self.package_root = pathlib.Path(__file__).parent.parent
-        self.home = pathlib.Path(os.environ['HOME'])
         self._cache = self.home / '.cache' / 'f95zone'
         self.watchlist = self._cache / 'watchlist'
 
@@ -21,3 +21,14 @@ class PathMeta(object):
     def cache(self):
         self.make_path(self._cache)
         return self._cache
+
+    @property
+    def platform(self):
+        return platform.system()
+
+    @property
+    def home(self):
+        if self.platform == 'Linux':
+            return pathlib.Path(os.environ['HOME'])
+        elif self.platform == 'Windows':
+            return pathlib.WindowsPath(os.environ['USERPROFILE'])

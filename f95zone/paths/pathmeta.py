@@ -28,7 +28,9 @@ class PathMeta(object):
 
     @property
     def home(self):
-        if self.platform == 'Linux':
+        if self.platform == 'Linux' or 'Darwin':
             return pathlib.Path(os.environ['HOME'])
         elif self.platform == 'Windows':
             return pathlib.WindowsPath(os.environ['USERPROFILE'])
+        else:
+            raise OSError('Operating system is not supported')

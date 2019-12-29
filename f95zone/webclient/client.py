@@ -21,6 +21,7 @@ class Client(object):
             title: requests_html.Element = title[0]
             title: str = title.text
             title: str = title.replace(u'\xa0', u' ')
+
         tags: list = response.html.find('a.tagItem')
         if tags:
             temp = list()
@@ -29,16 +30,18 @@ class Client(object):
                 temp.append(item.text)
             tags = temp
             del temp
-        overview: list = response.html.find('div.bbWrapper')
-        if overview:
-            overview: requests_html.Element = overview[0]
-            overview: str = overview.text
-            overview: str = overview.replace(u'\u200b', '')
+
+        overview_block: list = response.html.find('div.bbWrapper')
+        if overview_block:
+            overview_block: requests_html.Element = overview_block[0]
+            overview_block: str = overview_block.text
+            overview_block: str = overview_block.replace(u'\u200b', '')
 
         data = {
             'title': title,
             'tags': tags,
-            'overview': overview,
-            'url': url
+            'overview_block': overview_block,
+            'url': url,
+            'raw_html': response.html
         }
         return data

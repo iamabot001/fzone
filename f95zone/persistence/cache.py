@@ -5,6 +5,9 @@ import json
 from f95zone.parsers.title import TitleParser
 from f95zone.parsers.overview import OverviewParser
 from f95zone.parsers.watchlist import WatchlistParser
+from f95zone.parsers.thread_dates import ThreadDateParser
+from f95zone.parsers.developer import DeveloperParser
+from f95zone.parsers.changelog import ChangelogParser
 from f95zone.webclient.client import Client
 from f95zone.paths.pathmeta import PathMeta
 from f95zone.novel.visual_novel import VisualNovel
@@ -22,15 +25,21 @@ class Cache(object):
         for url in watchlist:
             raw_data: dict = self.client.get_game_data(url)
             title: dict = TitleParser(raw_data['title']).title
-            overview: str = 'None'  # OverviewParser(raw_data['overview']).overview (disabled until fix is issued)
+            overview: str = OverviewParser(raw_data['overview_block']).overview
+            thread_dates = ThreadDateParser(raw_data['overview_block']).dates
+            developer = DeveloperParser(raw_data['overview_block']).developer
+            changelog = ChangelogParser(raw_data['overview_block']).changelog
+
             game = {
                 'name': title['name'],
                 'title_tags': title.get('tags', None),
                 'tags': raw_data['tags'],
                 'version': title['version'],
-                'developer': title['developer'],
+                'developer': developer,
                 'overview': overview,
-                'url': url
+                'date': thread_dates,
+                'url': url,
+                'changelog': changelog
             }
             novels.append(VisualNovel(**game))
         return novels

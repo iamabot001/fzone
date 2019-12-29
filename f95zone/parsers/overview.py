@@ -15,6 +15,8 @@ class OverviewParser(object):
         overview: list = re.findall(OverviewPattern().pattern, self._overview)
         if overview:
             overview: str = overview[0]
+            overview: str = re.sub(r'<.*>', '', overview)
+            overview: str = re.sub('\n{2,}', '\n', overview)
             return overview
 
     @property

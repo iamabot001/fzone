@@ -5,7 +5,17 @@ class VisualNovel(object):
     """
     A game
     """
-    def __init__(self, name: str, title_tags: list, tags: list, overview: str, version: str, developer: str, url: str):
+    def __init__(self,
+                 name: str,
+                 title_tags: list,
+                 tags: list,
+                 overview: str,
+                 version: str,
+                 developer: dict,
+                 url: str,
+                 date: str,
+                 changelog: str
+                 ):
         self.name = name
         self.title_tags = title_tags
         self.tags = tags
@@ -13,6 +23,8 @@ class VisualNovel(object):
         self.version = version
         self.developer = developer
         self.url = url
+        self.date = date
+        self.changelog = changelog
 
     def __repr__(self):
         string = (
@@ -23,6 +35,8 @@ class VisualNovel(object):
             f'Version: {self.version}\n'
             f'Developer: {self.developer}\n'
             f'Link: {self.url}\n'
+            f'Thread Updates: {self.date}'
+            f'Changelog: {self.changelog}'
             )
         return string
 
@@ -35,7 +49,9 @@ class VisualNovel(object):
             'overview': self.overview,
             'version': self.version,
             'developer': self.developer,
-            'url': self.url
+            'url': self.url,
+            'date': self.date,
+            'changelog': self.changelog
         }
         return vn_data
 

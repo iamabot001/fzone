@@ -15,6 +15,29 @@ if __name__ == '__main__':
     data_store = paths.cache / 'data0.pickle'
 
     argp.add_argument(
+        '-usr',
+        '--username',
+        action='store',
+        default=None,
+        dest='username',
+        help='Username, if you want to login to get links'
+    )
+
+    argp.add_argument(
+        '-pass',
+        '--password',
+        action='store',
+        default=None,
+        dest='password',
+        help=(
+            'Password for the given username'
+            'if empty, you will be safely prompted to enter the password when required'
+            'if provided it may echo in the shell history'
+            'Recommended: Do not provide via argument'
+        )
+    )
+
+    argp.add_argument(
         '-f',
         '--force',
         dest='force',
@@ -38,18 +61,23 @@ if __name__ == '__main__':
         default=False,
         help='export data to json file'
     )
-    args = argp.parse_args('-e'.split())
+    args = argp.parse_args()
+
+    username = args.username
+    if args.username is None:
+        password = None
+    else:
+        password = getpass.getpass("Enter password: ") if args.password is None else args.password
 
     def generate_watchlist():
-        username = input("Enter username: ")
-        password = getpass.getpass("Enter password: ")
         crawler = Crawler(username, password)
         status: bool = crawler.dump()
         if status:
             print("Watchlist generated ...")
 
     def dump_data():
-        cache = Cache()
+        print("Caching data, this may take a while ...")
+        cache = Cache(username, password)
         status = cache.dump(json_format=True)
         if status:
             print("Data cached")
@@ -62,7 +90,7 @@ if __name__ == '__main__':
             return loader.json_friendly
 
     def export_cache_to_json():
-        Cache().export_to_json()
+        Cache(username, password).export_to_json()
 
     def main():
         if args.update:

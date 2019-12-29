@@ -15,9 +15,9 @@ from f95zone.persistence.loader import Loader
 
 
 class Cache(object):
-    def __init__(self):
+    def __init__(self, username: str = None, password: str = None):
         self.paths = PathMeta()
-        self.client = Client()
+        self.client = Client(username, password)
 
     def generate_cache(self) -> list:
         novels = []

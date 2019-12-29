@@ -11,6 +11,7 @@ class Crawler(object):
     Crawl for games in your watchlist
     """
     response_type = typing.Union[requests.Response, requests_html.HTMLResponse]
+    instances = list()
 
     def __init__(self, username: str, password: str):
         self.__username = username
@@ -18,6 +19,7 @@ class Crawler(object):
         self.session = requests_html.HTMLSession()
         self.logged_in = False
         self.paths = PathMeta()
+        Crawler.instances.append(self)
 
     @property
     def _api_ends(self) -> dict:

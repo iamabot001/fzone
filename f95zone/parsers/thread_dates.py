@@ -11,7 +11,7 @@ class ThreadDateParser(object):
         dates: list = re.findall(ThreadDatePattern().pattern, self._dates)
         if dates:
             dates: str = dates[0]
-            dates: str = re.sub(r'<.*>', '', dates)
+            dates: str = re.sub(r'<.*?>', '', dates)
             dates: str = re.sub(r'\n{2,}', '', dates)
             return dates
 

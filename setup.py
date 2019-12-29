@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='f95zone',
-    version='0.1',
+    version='0.2',
     packages=setuptools.find_packages(),
     install_requires=['requests', 'requests_html', 'wheel', 'setuptools', ],
     include_package_data=True,
